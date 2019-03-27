@@ -1,10 +1,10 @@
-# m3-project
+
 Module 3 project Ironhack by Andreu, Agustin &amp; Xavi
 # Project Name
 
 ## Description
 
-This is a system acution intended for services between privates.
+This is a system acution intended for exchanging services between privates.
 
 ## User Stories
 
@@ -169,16 +169,23 @@ BuyerRating 	- Number         // optional
     - 401 when no session     
 
 -  POST  `/auctions/create` 
-    - body : (empty )
-    - 204 no content
-      
+    - 401 when no session 
+    - body: 
+	-name 
+	-description 
+	-startingprice 
+	-Ending time
+   - validation
+	- fields not empty (422)    
+    - store auction in db
+    - 200 with auction    
+
 
 -  DELETE `/auction/:id` 
-    - body: (empty - the user is already stored in the session)
-    - remove from favorites
-    - updates user in session
-
-
+    - 200 removed from db body: (empty )
+    - 404 not found (if 2 deletes are issued at a time) 
+    - 401 when no session
+     
 ## Links
 
 ### Trello
