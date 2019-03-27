@@ -87,10 +87,11 @@ Geo Location:
 User model
 
 ```
-username - String // required
+email - String // required
 password - String // required
 image	 - String // optional
-Mobile	 - Phone??  // optional
+mobile	 - Number // optional
+location - String // optional
 ```
 
 Service model
@@ -99,18 +100,23 @@ Service model
 owner		 - ObjectID<User> // required
 name		 - String // required
 description 	 - String // required
-starting price   - Number // require
-Ending time	 - Date DD/MM/YYYY HH:MM:SS //required
+image		 - String // optional
+StartingPrice    - Number // require
+EndingTime	 - Date DD/MM/YYYY HH:MM:SS //required
+status		 - Boolean //required // default: true
 
 ```
 
 Bid model
 ``` 
-Service		- ObjectID<User> // required
-Buyer		- ObjectID<User> // required
-Price		- Number	 // required
+service		- ObjectID<Service> // required
+buyer		- ObjectID<User> // required
+price		- Number	 // required
 SellerRating	- Number         // optional
 BuyerRating 	- Number         // optional
+BidDate		- Date		 // optional
+
+```
 
 ## API Endpoints (backend routes)
 
