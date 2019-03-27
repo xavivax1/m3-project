@@ -45,8 +45,9 @@ Geo Location:
  `put` 	 |`/user/:id/edit` 	|UserProfile Edit	|user only 	|edit my user profile
  `get`   |`/auctions` 	 	|List Auctioms	 	|user only 	|show all auctions except mine ones
  `get`   |`/auction/:id` 	|Auction Detail	 	|user only 	|show auction details
- `post`	 |`/auctions/create` 	|Auction Create	 	|user only 	|create a new auction
+ `post`	 |`/auction/create` 	|Auction Create	 	|user only 	|create a new auction
  `delete`|`/auction/:id` 	|Auction Delete	 	|user only 	|delete auction
+ `get`   |`/auctions/me` 	 	|List Auctioms	 	|user only 	|show all user auctions 
 
 
 

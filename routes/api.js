@@ -46,8 +46,52 @@ router.get('auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
     const list = await Service.find();
-    list.map()
-  } catch (error) {
+    const othersList = list.filter(owner === !id);
+    res.status(200).json({message:'Auctions list returned', data:othersList});
+  } catch (err) {
+    next(err)
+  }
+});
+
+router.get('auctions/me', isLoggedIn(), async (req, res, next) => {
+  const id = req.session.currentUser._id;
+  try {
+    const list = await Service.find({owner: id});
+    res.status(200).json({message:'Auctions list returned', data:list});
+  } catch (err) {
+    next(err)
+  }
+});
+
+router.get('auction/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.param;
+  try {
+    const auction = await Service.findById(id);
+    res.status(200).json({message:'Auction detail', data:auction})
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('auction/create', isLoggedIn(), async (req, res, next) => {
+  const owner = req.session.currentUser._id;
+  const {name, description, image, StartingPrice, EndingTime, status}
+  const newAuction = {owner, name, description, image, StartingPrice, EndingTime, status}
+  
+  try {
+    await Service.create(newAuction);
+  } catch (err) {
+    next(err)
+  }
+});
+
+router.delete('auction/:id', isLoggedIn(), async (req, res, next) => {
+  const {id} = req.params
+
+  try {
+    await Service.findByIdAndDelete(id);
+    res.status(200).json({message:'Auction deleted'})
+  } catch (err) {
     next(err)
   }
 });
