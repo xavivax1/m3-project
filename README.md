@@ -9,11 +9,11 @@ This is a system acution intended for exchanging services between privates.
 ## User Stories
 
 -  **404:** As an anon/user I can see a 404 page if I try to reach a page that does not exist so that I know it's my fault
--  **Signup:** As an anon I can sign up in the platform so that I can start saving favorite restaurants
--  **Login:** As a user I can login to the platform so that I can see my favorite restaurants
+-  **Signup:** As an anon I can sign up in the platform so that I can see the signup form.
+-  **Login:** As a user I can login to the platform so that I can see the login page.
 -  **Logout:** As a user I can logout from the platform so no one else can use it
--  **Add Service** As a user I can CRUD an auction to provide a service so anybody can buy it
--  **List Auctions** As a user I'll list the open auctions.
+-  **Add auction** As a user I can CRUD an auction to provide a service so anybody can bid on it
+-  **List Auctions** As a user I'll see the open auctions.
 -  **Edit my profile** As a user I'll feed my profile, update it or even delete it. (CRUD )
 -  **Auctions detail** As a user I want to see my auctions detail (img,name, desc, ..., 
 -  **See my offering auctions** As a user I want to list my autions on bid
@@ -22,7 +22,7 @@ This is a system acution intended for exchanging services between privates.
 
 ## Backlog
 
-User profile:
+- Pasarela de pago. (stripe)
 
 - Messaging. to the users from the system to notify auction events, between users fr 
 
@@ -31,8 +31,6 @@ Geo Location:
 - show event in a map in event detail page
 - show all events in a map in the event list page
 
-Homepage:
-- ...
   
 # Client
 
