@@ -192,10 +192,8 @@ BuyerRating 	- Number         // optional
 
 ### Git
 
-	https://github.com/xavivax1/m3-project
-
-[Client repository Link](http://github.com)
-[Server repository Link](http://github.com)
+[Client repository Link](https://github.com/andreucc/auctions-front)
+[Server repository Link](https://github.com/xavivax1/m3-project)
 [Deploy Link](http://heroku.com)
 
 ### Slides
