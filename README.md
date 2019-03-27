@@ -101,6 +101,7 @@ name		 - String // required
 description 	 - String // required
 starting price   - Number // require
 Ending time	 - Date DD/MM/YYYY HH:MM:SS //required
+Image		 - String // optional
 
 ```
 
