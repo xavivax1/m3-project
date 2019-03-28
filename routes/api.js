@@ -9,6 +9,24 @@ const Bid = require('../models/Bid');
 const { isLoggedIn, isNotLoggedIn, validationLoggin } = require('../helpers/middlewares');
 
 
+router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
+  const owner = req.session.currentUser._id;
+  const {name, description, image, StartingPrice, EndingTime, status}= req.body;
+  const newAuction = {owner, name, description, image, StartingPrice, EndingTime, status};
+
+
+  try {
+    const prueba= await Service.create(newAuction);
+    console.log(prueba);
+    const service = prueba._id;
+    const price = StartingPrice;
+    const newBid = {service, owner, price};
+    await Bid.create(newBid);
+    res.status(200).json({message: "auction created", data: newAuction})
+  } catch (err) {
+    next(err)
+  }
+});
 
 router.put('/user/:id/edit', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
@@ -40,12 +58,11 @@ router.get('user/me', isLoggedIn(), async (req, res, next) => {
 
 
 
-router.get('auctions', isLoggedIn(), async (req, res, next) => {
+router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const list = await Service.find();
-    const othersList = list.filter(owner === !id);
-    res.status(200).json({message:'Auctions list returned', data:othersList});
+    const list = await Service.find({owner: {$ne: id}});
+    res.status(200).json({message:'Auctions list returned', data:list});
   } catch (err) {
     next(err)
   }
@@ -61,27 +78,17 @@ router.get('auctions/me', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-router.get('auction/:id', isLoggedIn(), async (req, res, next) => {
-  const { id } = req.param;
+
+router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
   try {
-    const auction = await Service.findById(id);
+    const auction = await Bid.find().populate('service');
     res.status(200).json({message:'Auction detail', data:auction})
   } catch (err) {
     next(err);
   }
 });
 
-router.post('auction/create', isLoggedIn(), async (req, res, next) => {
-  const owner = req.session.currentUser._id;
-  const {name, description, image, StartingPrice, EndingTime, status}= req.body;
-  const newAuction = {owner, name, description, image, StartingPrice, EndingTime, status};
-  
-  try {
-    await Service.create(newAuction);
-  } catch (err) {
-    next(err)
-  }
-});
 
 router.delete('auction/:id', isLoggedIn(), async (req, res, next) => {
   const {id} = req.params

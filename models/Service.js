@@ -32,6 +32,7 @@ const serviceSchema = new Schema({
     required: true,
     default: true
   }
+  
 });
 
 const Service = mongoose.model('Service', serviceSchema);
