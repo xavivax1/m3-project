@@ -57,11 +57,12 @@ router.get('user/me', isLoggedIn(), async (req, res, next) => {
 });
 
 
-
-router.get('/auctions', isLoggedIn(), async (req, res, next) => {
+router.get('/auctions', async (req, res, next) => {
+  // isLoggedIn(),
   const id = req.session.currentUser._id;
   try {
-    const list = await Service.find({owner: {$ne: id}});
+    const list = await Service.find();
+    // {owner: {$ne: id}}
     res.status(200).json({message:'Auctions list returned', data:list});
   } catch (err) {
     next(err)
