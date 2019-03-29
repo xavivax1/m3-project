@@ -27,6 +27,19 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
   }
 });
 
+router.get('/user/me', isLoggedIn(), async (req, res, next) => {
+  const id = req.session.currentUser._id;
+  console.log(id)
+  try {
+    const profile = await User.findById(id)
+    console.log(profile)
+    return res.status(200).json(profile);
+  }
+  catch (err) {
+    next(err);
+  }
+});
+
 router.put('/user/:id/edit', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { username, image, mobile, location} = req.body;
@@ -42,16 +55,23 @@ router.put('/user/:id/edit', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-router.get('user/me', isLoggedIn(), async (req, res, next) => {
+router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const user = user.findById(id)
-    return res.status(200).json(user);
-  }
-  catch (err) {
-    next(err);
+    const all = await Bid.find().populate('service').populate('buyer');
+    console.log(`hola${all[0].service.owner}`)
+    // const list = await Service.find({owner: id});
+    const list = all.filter((e) => {
+      console.log(e.service.owner, id)
+      return e.service.owner.equals(id)
+    })
+    console.log(list)
+    res.status(200).json({message:'Auctions list returned', data:list});
+  } catch (err) {
+    next(err)
   }
 });
+
 
 router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
@@ -63,20 +83,11 @@ router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-router.get('auctions/me', isLoggedIn(), async (req, res, next) => {
-  const id = req.session.currentUser._id;
-  try {
-    const list = await Service.find({owner: id});
-    res.status(200).json({message:'Auctions list returned', data:list});
-  } catch (err) {
-    next(err)
-  }
-});
 
 router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try {
-    const auction = await Bid.find().populate('service');
+    const auction = await Bid.find(id).populate('service');
     res.status(200).json({message:'Auction detail', data:auction})
   } catch (err) {
     next(err);
