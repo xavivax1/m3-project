@@ -1,22 +1,16 @@
 const express = require('express');
 const router = express.Router();
-
-
 const User = require('../models/user');
 const Service = require('../models/Service');
 const Bid = require('../models/Bid');
-
-const { isLoggedIn, isNotLoggedIn, validationLoggin } = require('../helpers/middlewares');
-
+const { isLoggedIn } = require('../helpers/middlewares');
 
 router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
   const owner = req.session.currentUser._id;
   const {name, description, image, StartingPrice, EndingTime, status}= req.body;
   const newAuction = {owner, name, description, image, StartingPrice, EndingTime, status};
-  console.log(newAuction);
   try {
     const prueba= await Service.create(newAuction);
-    
     const service = await prueba._id;
     const price = StartingPrice;
     const buyer = owner;
@@ -30,10 +24,8 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
 
 router.get('/user/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
-  console.log(id)
   try {
     const profile = await User.findById(id)
-    console.log(profile)
     return res.status(200).json(profile);
   }
   catch (err) {
@@ -44,7 +36,6 @@ router.get('/user/me', isLoggedIn(), async (req, res, next) => {
 router.put('/user/:id/edit', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { username, image, mobile, location} = req.body;
-  console.log(req);
   const user = {
     username, image, mobile, location
   }; 
@@ -61,19 +52,14 @@ router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
     const all = await Bid.find().populate('service').populate('buyer');
-    console.log(`hola${all[0].service.owner}`)
-    // const list = await Service.find({owner: id});
     const list = all.filter((e) => {
-      console.log(e.service.owner, id)
       return e.service.owner.equals(id)
     })
-    console.log(list)
     res.status(200).json({message:'Auctions list returned', data:list});
   } catch (err) {
     next(err)
   }
 });
-
 
 router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
@@ -88,19 +74,12 @@ router.get('/auctions', isLoggedIn(), async (req, res, next) => {
 router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try { 
-    const auction = await Bid.find().populate('service').populate('buyer') ;
-    const list = auction.filter((e) => {
-      return e.service._id.equals(id)
-    })
-    const lengthArray = list.length-1;
-    //ESTO VA A FALLAR YA QUE LA ULTIMA PUJA HECHA PUEDE NO SER LA ULTIMA PUJA QUE NOS DEVUELVA
-    const maxAuction = list[lengthArray];
-    res.status(200).json({message:'Auction detail', data:maxAuction})
+    const auction = await Bid.find({service: {$eq: id}}).sort({price:-1}).limit(1).populate('service').populate('buyer');
+    res.status(200).json({message:'Auction detail', data: auction})
   } catch (err) {
     next(err);
   }
 });
-
 
 router.delete('auction/:id', isLoggedIn(), async (req, res, next) => {
   const {id} = req.params
