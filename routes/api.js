@@ -85,16 +85,22 @@ router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-
 router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
-  try {
-    const auction = await Bid.find(id).populate('service');
-    res.status(200).json({message:'Auction detail', data:auction})
+  try { 
+    const auction = await Bid.find().populate('service').populate('buyer') ;
+    const list = auction.filter((e) => {
+      return e.service._id.equals(id)
+    })
+    const lengthArray = list.length-1;
+    //ESTO VA A FALLAR YA QUE LA ULTIMA PUJA HECHA PUEDE NO SER LA ULTIMA PUJA QUE NOS DEVUELVA
+    const maxAuction = list[lengthArray];
+    res.status(200).json({message:'Auction detail', data:maxAuction})
   } catch (err) {
     next(err);
   }
 });
+
 
 router.delete('auction/:id', isLoggedIn(), async (req, res, next) => {
   const {id} = req.params
