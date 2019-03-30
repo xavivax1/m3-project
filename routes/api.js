@@ -13,10 +13,11 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
   const owner = req.session.currentUser._id;
   const {name, description, image, StartingPrice, EndingTime, status}= req.body;
   const newAuction = {owner, name, description, image, StartingPrice, EndingTime, status};
+  console.log(newAuction);
   try {
     const prueba= await Service.create(newAuction);
-    console.log(prueba);
-    const service = prueba._id;
+    
+    const service = await prueba._id;
     const price = StartingPrice;
     const buyer = owner;
     const newBid = {service, buyer, price};
@@ -43,6 +44,7 @@ router.get('/user/me', isLoggedIn(), async (req, res, next) => {
 router.put('/user/:id/edit', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { username, image, mobile, location} = req.body;
+  console.log(req);
   const user = {
     username, image, mobile, location
   }; 
