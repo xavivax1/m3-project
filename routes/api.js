@@ -63,12 +63,13 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
 router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const all = await Bid.find().populate('service').populate('buyer');
-    const list = all.filter((e) => {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const uniqueList = unicos(all, "service");
+    const list = uniqueList.filter((e) => {
       return e.service.owner.equals(id) && e.service.status === true
     })
-    const uniqueList = unicos(list, "service")
-    res.status(200).json({ message: 'Auctions list returned', data: uniqueList });
+    
+    res.status(200).json({ message: 'Auctions list returned', data: list });
   } catch (err) {
     next(err)
   }
@@ -78,8 +79,9 @@ router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
 router.get('/auctions/me/finished', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const all = await Bid.find().populate('service').populate('buyer');
-    const list = all.filter((e) => {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const uniqueList = unicos(all, "service");
+    const list = uniqueList.filter((e) => {
       return e.service.owner.equals(id) && e.service.status === false
     })
     res.status(200).json({ message: 'Auctions list returned', data: list });
@@ -93,7 +95,10 @@ router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
     const prelist = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
-    const list = unicos(prelist, "service")
+    const uniqueList = unicos(prelist, "service")
+    const list = uniqueList.filter((e) => {
+      return e.service.owner != id && e.service.status === true 
+    })
     res.status(200).json({ message: 'Auctions list returned', data: list });
   } catch (err) {
     next(err)
