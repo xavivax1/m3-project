@@ -48,7 +48,8 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
   const newAuction = { owner, name, description, image, StartingPrice, EndingTime, status };
   try {
     const prueba = await Service.create(newAuction);
-    const service = await prueba._id;
+    console.log(prueba)
+    const service = prueba._id;
     const price = StartingPrice;
     const buyer = owner;
     const newBid = { service, buyer, price };
