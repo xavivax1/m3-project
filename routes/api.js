@@ -149,6 +149,7 @@ router.post('/bid/create', isLoggedIn(), async (req, res, next) => {
   const newBid = { service, buyer, price}
   try {
     await Bid.create(newBid);
+    res.status(200).json({ message: 'bid created' })
   } catch (err) {
     next(err)
   }
