@@ -121,7 +121,10 @@ router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try {
     const auction = await Bid.find({ service: { $eq: id } }).sort({ price: -1 }).limit(1).populate('service').populate('buyer');
-    res.status(200).json({ message: 'Auction detail', data: auction })
+    const ownerId = auction[0].service.owner
+    const owner = await User.findById(ownerId)
+    const data = { auction, owner}
+    res.status(200).json({ message: 'Auction detail', data: data })
     console.log(auction);
   } catch (err) {
     next(err);
