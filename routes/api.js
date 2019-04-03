@@ -144,7 +144,7 @@ router.get('/auctions/bidded', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-//Lista de auctions finalizadas donde he pujado
+//Lista de auctions finalizadas donde he pujado y he perdido
 router.get('/auctions/bidded/finished', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
@@ -155,7 +155,10 @@ router.get('/auctions/bidded/finished', isLoggedIn(), async (req, res, next) => 
       return e.service.buyers.includes(`${user}`) && e.service.status === false
     })
     const list = unicos(prelist, "service")
-    res.status(200).json({ message: 'MyBidded Auctions list returned', data: list });
+    const loosed = list.filter((i) => {
+      return i.buyer._id != id && i.service.status === false
+    })
+    res.status(200).json({ message: 'My Loosed Auctions list returned', data: loosed });
   } catch (err) {
     next(err)
   }
@@ -191,6 +194,7 @@ router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
     next(err);
   }
 });
+
 
 //Borrar servicio y todas sus pujas
 router.delete('/auction/:id', isLoggedIn(), async (req, res, next) => {
