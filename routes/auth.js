@@ -44,10 +44,11 @@ router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => 
     }, 'username')
     .then((userExists) => {
       if (userExists) {
-        const err = new Error('Unprocessable Entity');
-        err.status = 422;
-        err.statusMessage = 'username-not-unique';
-        next(err);
+        // const err = new Error('Unprocessable Entity');
+        // err.status = 422;
+        // err.statusMessage = 'username-not-unique';
+        // next(err);
+        return res.status(422).json({error: 'username already exists'})
       }
       else {
         const salt = bcrypt.genSaltSync(10);
