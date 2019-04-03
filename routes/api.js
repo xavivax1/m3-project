@@ -1,3 +1,5 @@
+//import moment from 'moment';
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
@@ -12,7 +14,24 @@ const { isLoggedIn } = require('../helpers/middlewares');
     return unics.indexOf(item[filtrar]) < 0 ? unics.push(item[filtrar]) : false
   })
 }
+// maintenance
+router.get('/maintenance', isLoggedIn(), async (req, res, next) => {
 
+  const fecha = new Date();  
+  try {
+    console.log(fecha);
+    const res = await Service.updateMany({ 
+                                          EndingTime: {"$lt": fecha},
+                                           status : true },
+                                          { status: false });
+    // db.services.updateMany ({ EndingTime: {"$lt": "2019-04-03T08:39:18.743Z"}, status : true },{ status: false })
+    console.log('updated:'+ res.nModified);
+  }
+  catch (err) {
+    console.log(err)
+    next(err);
+  }
+});
 //Recibir información del perfil
 router.get('/user/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
@@ -155,6 +174,31 @@ router.post('/bid/create', isLoggedIn(), async (req, res, next) => {
     next(err)
   }
 })
+
+
+router.get('/', isLoggedIn(), async (req, res, next) => {
+  try {
+    const auction = await Service.find().sort({ EndingTime }).limit(1);
+    const endTime = new Date(aution.EndingTime);
+
+    console.log(now);
+    if (end - now > 100000) {
+      setTimeout(check(), 100000);    
+    }
+    else {
+      setTimeout(check(), auction.EndingTime - auction)
+    }
+  }
+  catch (err) {
+    next(err);
+  }
+});
+
+// busquem registres >= que datetime
+//db.services.find({ EndingTime: {"$gte": new Date("2019-05-17T13:42:13Z")}})
+// busquem auctions caducades que estan actives
+//db.services.find({ EndingTime: {"$lt": new Date("2019-05-22T13:00:13Z")}, status : true}).count()
+
 
 /*
 router.get('/check', isLoggedIn(), async (req, res, next) => {
