@@ -11,6 +11,10 @@ const serviceSchema = new Schema({
     type: String,
     required: true
   },
+  buyers: {
+    type: Array,
+    default: []
+  },
   description: {
     type: String,
     required: false

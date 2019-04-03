@@ -83,12 +83,13 @@ router.post('/auction/create', isLoggedIn(), async (req, res, next) => {
 router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const all = await Bid.find().populate('service').populate('buyer');
-    const list = all.filter((e) => {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const uniqueList = unicos(all, "service");
+    const list = uniqueList.filter((e) => {
       return e.service.owner.equals(id) && e.service.status === true
     })
-    const uniqueList = unicos(list, "service")
-    res.status(200).json({ message: 'Auctions list returned', data: uniqueList });
+    
+    res.status(200).json({ message: 'Auctions list returned', data: list });
   } catch (err) {
     next(err)
   }
@@ -98,8 +99,9 @@ router.get('/auctions/me', isLoggedIn(), async (req, res, next) => {
 router.get('/auctions/me/finished', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
-    const all = await Bid.find().populate('service').populate('buyer');
-    const list = all.filter((e) => {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const uniqueList = unicos(all, "service");
+    const list = uniqueList.filter((e) => {
       return e.service.owner.equals(id) && e.service.status === false
     })
     res.status(200).json({ message: 'Auctions list returned', data: list });
@@ -113,7 +115,10 @@ router.get('/auctions', isLoggedIn(), async (req, res, next) => {
   const id = req.session.currentUser._id;
   try {
     const prelist = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
-    const list = unicos(prelist, "service")
+    const uniqueList = unicos(prelist, "service")
+    const list = uniqueList.filter((e) => {
+      return e.service.owner != id && e.service.status === true 
+    })
     res.status(200).json({ message: 'Auctions list returned', data: list });
   } catch (err) {
     next(err)
@@ -126,22 +131,61 @@ router.get('/auctions/bidded', isLoggedIn(), async (req, res, next) => {
   try {
     // const all = await Bid.find({ buyer: { $eq: id } }).sort({ price: -1 }).populate('service').populate('buyer');
     const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const profile = await User.findById(id)
+    const user = await profile.username
+    console.log(user)
     const prelist = all.filter((e) => {
-      return e.buyer.equals(id) && e.service.status === true
+      return e.service.buyers.includes(`${user}`) && e.service.status === true
     })
     const list = unicos(prelist, "service")
-    res.status(200).json({ message: 'Auctions list returned', data: list });
+    res.status(200).json({ message: 'MyBidded Auctions list returned', data: list });
   } catch (err) {
     next(err)
   }
 });
+
+//Lista de auctions finalizadas donde he pujado
+router.get('/auctions/bidded/finished', isLoggedIn(), async (req, res, next) => {
+  const id = req.session.currentUser._id;
+  try {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const profile = await User.findById(id)
+    const user = await profile.username
+    const prelist = all.filter((e) => {
+      return e.service.buyers.includes(`${user}`) && e.service.status === false
+    })
+    const list = unicos(prelist, "service")
+    res.status(200).json({ message: 'MyBidded Auctions list returned', data: list });
+  } catch (err) {
+    next(err)
+  }
+});
+
+//Lista de auctions finalizadas donde he ganado la puja
+router.get('/auctions/bidded/winned', isLoggedIn(), async (req, res, next) => {
+  const id = req.session.currentUser._id;
+  try {
+    const all = await Bid.find().sort({ price: -1 }).populate('service').populate('buyer');
+    const prelist = unicos(all, "service")
+    const list = prelist.filter((e) => {
+      return e.buyer.equals(id) && e.service.status === false
+    })
+    res.status(200).json({ message: 'MyWinned Auctions list returned', data: list });
+  } catch (err) {
+    next(err)
+  }
+});
+
 
 //Detalle de la auction
 router.get('/auction/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try {
     const auction = await Bid.find({ service: { $eq: id } }).sort({ price: -1 }).limit(1).populate('service').populate('buyer');
-    res.status(200).json({ message: 'Auction detail', data: auction })
+    const ownerId = auction[0].service.owner
+    const owner = await User.findById(ownerId)
+    const data = { auction, owner}
+    res.status(200).json({ message: 'Auction detail', data: data })
     console.log(auction);
   } catch (err) {
     next(err);
@@ -169,6 +213,9 @@ router.post('/bid/create', isLoggedIn(), async (req, res, next) => {
   const newBid = { service, buyer, price}
   try {
     await Bid.create(newBid);
+    const profile = await User.findById(buyer)
+    let user = profile.username
+    await Service.findByIdAndUpdate(service, {$push : {"buyers": user} })
     res.status(200).json({ message: 'bid created' })
   } catch (err) {
     next(err)
