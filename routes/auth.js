@@ -12,7 +12,6 @@ router.get('/me', isLoggedIn(), (req, res, next) => {
 
 router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
   const { username, password } = req.body;
-
   User.findOne({
       username
     })
@@ -32,7 +31,6 @@ router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
 
 router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
   const { username, password } = req.body;
-
   User.findOne({
       username
     }, 'username')
@@ -48,7 +46,6 @@ router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => 
           username,
           password: hashPass,
         });
-  
         return newUser.save().then(() => {
           // TODO delete password 
           req.session.currentUser = newUser;
