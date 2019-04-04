@@ -18,13 +18,13 @@ router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
     })
     .then((user) => {
       if (!user) {
-        return res.status(404).json({error: 'user not exists'})
+        return res.status(404).json({error: true, code: 'user not exists'})
       }
       if (bcrypt.compareSync(password, user.password)) {
         req.session.currentUser = user;
         return res.status(200).json(user);
       } else {
-        return res.status(422).json({error: 'username already exists'})
+        return res.status(422).json({error: 'user/password invalid'})
       }
     })
     .catch(next);
