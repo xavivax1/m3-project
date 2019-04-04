@@ -18,19 +18,13 @@ router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
     })
     .then((user) => {
       if (!user) {
-        const err = new Error('Not Found');
-        err.status = 404;
-        err.statusMessage = 'Not Found';
-        next(err)
+        return res.status(404).json({error: 'user not exists'})
       }
       if (bcrypt.compareSync(password, user.password)) {
         req.session.currentUser = user;
         return res.status(200).json(user);
       } else {
-        const err = new Error('Unauthorized');
-        err.status = 401;
-        err.statusMessage = 'Unauthorized';
-        next(err);
+        return res.status(422).json({error: 'username already exists'})
       }
     })
     .catch(next);
@@ -44,11 +38,7 @@ router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => 
     }, 'username')
     .then((userExists) => {
       if (userExists) {
-        // const err = new Error('Unprocessable Entity');
-        // err.status = 422;
-        // err.statusMessage = 'username-not-unique';
-        // next(err);
-        return res.status(422).json({error: 'username already exists'})
+       return res.status(422).json({error: 'username already exists'})
       }
       else {
         const salt = bcrypt.genSaltSync(10);
